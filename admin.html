@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Smart Robotica — CMS Панель</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;height:100%}
+body{background:#050510;color:#fff;font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit;transition:.2s}
+ul{list-style:none}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit}
+:root{
+  --bg:#050510;--bg2:#09091c;--bg3:#0d0d22;--bg4:#111128;
+  --c:#00F0FF;--m:#BC13FE;
+  --border:rgba(0,240,255,.12);--border2:rgba(188,19,254,.25);
+  --text:#fff;--muted:#8888aa;
+  --grad:linear-gradient(90deg,#BC13FE,#00F0FF);
+  --fh:'Orbitron',sans-serif;--fb:'Rajdhani',sans-serif;
+  --r:6px;--sidebar:260px;--tr:.2s;
+}
+
+/* ── LAYOUT ── */
+.sidebar{
+  width:var(--sidebar);background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;height:100vh;top:0;left:0;
+  z-index:300;transition:transform .3s cubic-bezier(.25,.46,.45,.94);
+}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* Затемнение за сайдбаром (мобайл) */
+.sb-backdrop{
+  display:none;position:fixed;inset:0;
+  background:rgba(5,5,16,.75);backdrop-filter:blur(3px);
+  z-index:250;
+}
+.sb-backdrop.show{display:block}
+
+/* ── SIDEBAR ── */
+.sidebar__brand{
+  padding:22px 22px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.sidebar__brand img{height:32px;width:auto;object-fit:contain}
+.sidebar__brand-text h1{font-family:var(--fh);font-size:.72rem;letter-spacing:2px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar__brand-text span{font-size:.68rem;color:var(--muted);letter-spacing:1px}
+.sidebar__nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-group{margin-bottom:18px}
+.nav-group-label{font-family:var(--fh);font-size:.52rem;letter-spacing:3px;color:var(--muted);padding:0 12px;margin-bottom:6px;display:block}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--r);
+  font-size:.88rem;color:var(--muted);cursor:pointer;
+  transition:var(--tr);border:1px solid transparent;
+  user-select:none;
+}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--c);background:rgba(0,240,255,.07);border-color:rgba(0,240,255,.18)}
+.nav-item i{width:18px;text-align:center;font-size:.88rem;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--m);color:#fff;font-family:var(--fh);font-size:.52rem;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center}
+.sidebar__footer{padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0}
+.sidebar__footer a{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);padding:8px 0}
+.sidebar__footer a:hover{color:var(--c)}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+  height:56px;flex-shrink:0;
+}
+.topbar__left{display:flex;align-items:center;gap:12px;min-width:0;}
+.topbar__title{font-family:var(--fh);font-size:.78rem;letter-spacing:2px;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar__actions{display:flex;gap:8px;flex-shrink:0}
+
+/* Кнопка-бургер в топбаре (мобайл) */
+.sb-toggle-btn{
+  display:none;
+  width:36px;height:36px;
+  border:1px solid var(--border);border-radius:var(--r);
+  color:var(--text);align-items:center;justify-content:center;
+  font-size:.9rem;flex-shrink:0;transition:var(--tr);cursor:pointer;
+}
+.sb-toggle-btn:hover{border-color:var(--c);color:var(--c)}
+
+/* ── CONTENT ── */
+.content{padding:28px 32px;flex:1}
+
+/* ── TABS ── */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── STATS GRID ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:18px 22px;position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.stat-card__label{font-family:var(--fh);font-size:.55rem;letter-spacing:2px;color:var(--muted);margin-bottom:8px}
+.stat-card__val{font-family:var(--fh);font-size:1.8rem;font-weight:900;color:var(--c)}
+.stat-card__icon{position:absolute;bottom:10px;right:14px;font-size:1.5rem;opacity:.1;color:var(--c)}
+
+/* ── PANEL ── */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.panel__head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  background:var(--bg3);gap:10px;flex-wrap:wrap;
+}
+.panel__title{font-family:var(--fh);font-size:.72rem;letter-spacing:2px;color:var(--text)}
+.panel__body{padding:0}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:480px}
+th{
+  font-family:var(--fh);font-size:.57rem;letter-spacing:2px;color:var(--muted);
+  padding:12px 16px;text-align:left;background:var(--bg3);white-space:nowrap;
+}
+td{padding:11px 16px;font-size:.9rem;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-title{color:var(--text);font-weight:600}
+.td-img{width:52px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border)}
+.td-actions{display:flex;gap:6px;white-space:nowrap}
+.no-data{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
+
+/* Скрываемые колонки на мобиле */
+.col-hide{}
+
+/* ── BADGE ── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.65rem;letter-spacing:1px;font-family:var(--fh)}
+.badge--cyan{background:rgba(0,240,255,.1);color:var(--c)}
+.badge--mag{background:rgba(188,19,254,.1);color:var(--m)}
+.badge--gray{background:rgba(255,255,255,.07);color:var(--muted)}
+.badge--green{background:rgba(0,255,128,.1);color:#00ff88}
+.badge--red{background:rgba(255,77,109,.1);color:#ff4d6d}
+
+/* ── ICON BUTTONS ── */
+.icon-btn{
+  width:30px;height:30px;border:1px solid var(--border);border-radius:4px;
+  color:var(--muted);display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;cursor:pointer;background:none;font-family:inherit;transition:var(--tr);flex-shrink:0;
+}
+.icon-btn:hover{border-color:var(--c);color:var(--c)}
+.icon-btn.danger:hover{border-color:#ff4d6d;color:#ff4d6d}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;font-family:var(--fh);font-size:.68rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  border:none;cursor:pointer;border-radius:4px;transition:var(--tr);
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  white-space:nowrap;
+}
+.btn--primary{background:var(--grad);color:#fff}
+.btn--primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn--outline{background:transparent;border:1px solid var(--c);color:var(--c)}
+.btn--outline:hover{background:var(--c);color:#000}
+.btn--danger{background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.4);color:#ff4d6d}
+.btn--danger:hover{background:#ff4d6d;color:#fff}
+.btn--sm{padding:7px 15px;font-size:.62rem}
+.btn--xs{padding:5px 11px;font-size:.58rem}
+
+/* ── FORM ── */
+.form-section{padding:22px;border-bottom:1px solid var(--border)}
+.form-section:last-child{border-bottom:none}
+.form-section-title{font-family:var(--fh);font-size:.65rem;letter-spacing:2px;color:var(--c);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(0,240,255,.1)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid--3{grid-template-columns:1fr 1fr 1fr}
+.form-group{margin-bottom:0;display:flex;flex-direction:column;gap:5px}
+.form-group.span-2{grid-column:span 2}
+.form-group.span-3{grid-column:span 3}
+.form-label{font-family:var(--fh);font-size:.58rem;letter-spacing:2px;color:var(--muted)}
+.form-input{
+  padding:10px 14px;background:rgba(5,5,16,.7);
+  border:1px solid rgba(188,19,254,.25);border-radius:var(--r);
+  color:var(--text);font-family:var(--fb);font-size:.95rem;transition:var(--tr);
+  appearance:none;-webkit-appearance:none;width:100%;
+}
+.form-input:focus{outline:none;border-color:var(--c);box-shadow:0 0 12px rgba(0,240,255,.15)}
+.form-input::placeholder{color:rgba(136,136,170,.5)}
+.form-input option{background:var(--bg3)}
+textarea.form-input{resize:vertical;min-height:80px}
+.form-hint{font-size:.78rem;color:var(--muted)}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;padding:18px 22px;border-top:1px solid var(--border);background:var(--bg3);flex-wrap:wrap}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:42px;padding:8px 12px;background:rgba(5,5,16,.7);border:1px solid rgba(188,19,254,.25);border-radius:var(--r);cursor:text;transition:var(--tr)}
+.tag-input-wrap:focus-within{border-color:var(--c);box-shadow:0 0 12px rgba(0,240,255,.15)}
+.tag-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(188,19,254,.15);border:1px solid rgba(188,19,254,.3);color:var(--m);padding:3px 10px;border-radius:20px;font-size:.78rem}
+.tag-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:0;line-height:1;transition:color .2s}
+.tag-chip button:hover{color:#ff4d6d}
+.tag-input{border:none;background:transparent;color:var(--text);font-family:var(--fb);font-size:.88rem;outline:none;min-width:80px;flex:1}
+.features-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.feature-row{display:flex;gap:8px;align-items:center}
+.feature-row .form-input{flex:1}
+
+/* ── ALERT ── */
+.alert{padding:12px 18px;border-radius:var(--r);font-size:.88rem;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px}
+.alert--info{background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.2);color:var(--c)}
+.alert--warn{background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.2);color:#FFD700}
+.alert--success{background:rgba(0,255,128,.06);border:1px solid rgba(0,255,128,.2);color:#00ff88}
+.alert i{flex-shrink:0;margin-top:2px}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(5,5,16,.88);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;width:100%;max-width:500px;animation:mIn .25s ease;position:relative}
+.modal-box--sm{max-width:400px}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+.modal-head h3{font-family:var(--fh);font-size:.78rem;letter-spacing:2px;color:var(--c)}
+.modal-body{padding:22px}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:16px 22px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ── IMAGE PREVIEW ── */
+.img-preview{
+  width:100%;aspect-ratio:4/3;border:1px solid var(--border);border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:var(--bg);margin-top:8px;cursor:pointer;
+  transition:border-color .2s;
+}
+.img-preview:hover{border-color:var(--c)}
+.img-preview img{width:100%;height:100%;object-fit:cover}
+.img-preview-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:.85rem}
+.img-preview-placeholder i{font-size:2rem;opacity:.4}
+
+/* ── SWITCH ── */
+.switch-wrap{display:flex;align-items:center;gap:10px}
+.switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch__track{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:12px;transition:.3s;cursor:pointer;border:1px solid var(--border)}
+.switch input:checked + .switch__track{background:var(--grad);border-color:var(--c)}
+.switch__track::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.3s}
+.switch input:checked + .switch__track::after{transform:translateX(20px)}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;bottom:20px;right:16px;z-index:3000;display:flex;flex-direction:column;gap:8px;max-width:calc(100vw - 32px)}
+.toast{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;min-width:240px;max-width:320px;animation:tIn .3s ease;font-size:.88rem;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast--ok{border-left:3px solid var(--c)}
+.toast--err{border-left:3px solid #ff4d6d}
+.toast--ok i{color:var(--c)}
+.toast--err i{color:#ff4d6d}
+@keyframes tIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── LOGIN SCREEN ── */
+.login-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.login-box{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:12px;
+  padding:40px 36px;width:100%;max-width:400px;text-align:center;
+  animation:mIn .35s ease;
+}
+.login-logo{margin-bottom:24px}
+.login-logo h1{font-family:var(--fh);font-size:1rem;letter-spacing:3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.login-logo span{font-size:.75rem;color:var(--muted);letter-spacing:2px}
+.login-box .form-group{margin-bottom:16px;text-align:left}
+.login-error{color:#ff4d6d;font-size:.82rem;margin-top:-8px;margin-bottom:8px;display:none}
+.login-error.show{display:block}
+
+/* ── FILE UPLOAD ── */
+.file-upload-area{
+  border:2px dashed rgba(188,19,254,.3);border-radius:var(--r);
+  padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;
+  background:rgba(5,5,16,.5);margin-top:8px;
+}
+.file-upload-area:hover{border-color:var(--c)}
+.file-upload-area i{font-size:1.5rem;color:var(--muted);margin-bottom:6px;display:block}
+.file-upload-area span{font-size:.82rem;color:var(--muted)}
+.file-upload-area input[type=file]{display:none}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ════════════════════════════════════════════
+   TABLET ≤ 1024px
+   ════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .content{padding:20px 24px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:14px}
+}
+
+/* ════════════════════════════════════════════
+   MOBILE ≤ 900px — sidebar уезжает за экран
+   ════════════════════════════════════════════ */
+@media(max-width:900px){
+  /* Сайдбар прячется */
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+
+  /* Показываем бургер */
+  .sb-toggle-btn{display:flex}
+  .topbar{padding:0 14px}
+  .topbar__title{font-size:.68rem}
+
+  .content{padding:16px}
+
+  /* Скрываем второстепенные колонки таблиц */
+  .col-hide{display:none!important}
+
+  /* Таблицы */
+  th{padding:10px 12px;font-size:.52rem}
+  td{padding:10px 12px}
+
+  /* Мобильные кнопки экспорта: только иконка */
+  .btn-label{display:none}
+  .topbar__actions .btn{padding:7px 10px;clip-path:none;border-radius:4px}
+  .topbar__actions .btn i{margin:0}
+}
+
+/* ════════════════════════════════════════════
+   MOBILE ≤ 640px — агрессивная компактность
+   ════════════════════════════════════════════ */
+@media(max-width:640px){
+  /* Stats 2 колонки */
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+  .stat-card{padding:14px 16px}
+  .stat-card__val{font-size:1.5rem}
+  .stat-card__label{font-size:.5rem}
+  .stat-card__icon{display:none}
+
+  /* Формы — одна колонка */
+  .form-grid,.form-grid--3{grid-template-columns:1fr!important}
+  .form-group.span-2,.form-group.span-3{grid-column:1!important}
+  .form-section{padding:16px}
+  .form-actions{padding:14px 16px;gap:8px}
+
+  /* Кнопки в форме — равная ширина */
+  .form-actions .btn{flex:1;justify-content:center;clip-path:none;border-radius:4px}
+
+  /* Панели */
+  .panel__head{padding:12px 14px}
+  .panel__title{font-size:.62rem}
+  .content{padding:10px}
+
+  /* Таблицы — меньше отступы */
+  th{padding:8px 10px;font-size:.48rem;letter-spacing:1px}
+  td{padding:8px 10px;font-size:.84rem}
+  .td-img{width:40px;height:32px}
+
+  /* Переключатели секций */
+  #sections-list > div{padding:12px 14px !important}
+
+  /* Меньше padding в формах */
+  .form-section-title{font-size:.58rem}
+}
+
+/* ════════════════════════════════════════════
+   MOBILE ≤ 420px — самые маленькие экраны
+   ════════════════════════════════════════════ */
+@media(max-width:420px){
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px}
+  .stat-card{padding:12px}
+  .stat-card__val{font-size:1.3rem}
+  .login-box{padding:28px 20px}
+  .modal-body{padding:16px}
+  .modal-foot{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>SMART ROBOTICA</h1>
+      <span>ПАНЕЛЬ УПРАВЛЕНИЯ</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Логин</label>
+      <input class="form-input" id="login-user" placeholder="User" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input class="form-input" type="password" id="login-pass" placeholder="••••••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="login-error">Неверный логин или пароль</div>
+    <button class="btn btn--primary" style="width:100%;justify-content:center;clip-path:none;border-radius:6px" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Войти
+    </button>
+  </div>
+</div>
+
+<!-- Тёмный фон за сайдбаром (только мобайл) -->
+<div class="sb-backdrop" id="sb-backdrop"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+        <img src="logo.png" alt="SR" onerror="this.style.display='none'">
+        <div class="sidebar__brand-text">
+            <h1>SMART ROBOTICA</h1>
+            <span>CMS Панель</span>
+        </div>
+    </div>
+    <nav class="sidebar__nav">
+        <div class="nav-group">
+            <span class="nav-group-label">Обзор</span>
+            <div class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        </div>
+        <div class="nav-group">
+            <span class="nav-group-label">Контент</span>
+            <div class="nav-item" data-tab="products"><i class="fas fa-robot"></i> Продукты <span class="nav-badge" id="nav-prod-count">0</span></div>
+            <div class="nav-item" data-tab="news"><i class="fas fa-newspaper"></i> Новости <span class="nav-badge" id="nav-news-count">0</span></div>
+            <div class="nav-item" data-tab="sections"><i class="fas fa-puzzle-piece"></i> Разделы сайта</div>
+        </div>
+        <div class="nav-group">
+            <span class="nav-group-label">Система</span>
+            <div class="nav-item" data-tab="settings"><i class="fas fa-cog"></i> Настройки</div>
+            <div class="nav-item" data-tab="backup"><i class="fas fa-database"></i> Бэкап / Импорт</div>
+        </div>
+    </nav>
+    <div class="sidebar__footer">
+        <a href="index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Открыть сайт</a>
+        <a href="#" onclick="clearAll();return false"><i class="fas fa-trash"></i> Сбросить данные</a>
+        <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="topbar">
+        <div class="topbar__left">
+            <!-- Бургер (только мобайл) -->
+            <button class="sb-toggle-btn" id="sb-toggle" aria-label="Открыть меню">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="topbar__title" id="topbar-title">DASHBOARD</span>
+        </div>
+        <div class="topbar__actions">
+            <button class="btn btn--outline btn--sm" onclick="exportAll()">
+                <i class="fas fa-download"></i><span class="btn-label"> Экспорт</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- ────────────── DASHBOARD ────────────── -->
+        <div class="tab-panel active" id="tab-dashboard">
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-card__label">Продуктов</div><div class="stat-card__val" id="ds-prod">0</div><i class="fas fa-robot stat-card__icon"></i></div>
+                <div class="stat-card"><div class="stat-card__label">Новостей</div><div class="stat-card__val" id="ds-news">0</div><i class="fas fa-newspaper stat-card__icon"></i></div>
+                <div class="stat-card"><div class="stat-card__label">В корзинах</div><div class="stat-card__val" id="ds-cart">0</div><i class="fas fa-shopping-cart stat-card__icon"></i></div>
+                <div class="stat-card"><div class="stat-card__label">Разделов активно</div><div class="stat-card__val" id="ds-sec">0</div><i class="fas fa-puzzle-piece stat-card__icon"></i></div>
+            </div>
+            <div class="alert alert--info"><i class="fas fa-info-circle"></i> Данные хранятся в localStorage. Изменения сразу применяются на сайте. Для резервной копии — <strong>Экспорт</strong>.</div>
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">ПОСЛЕДНИЕ ПРОДУКТЫ</span><button class="btn btn--outline btn--xs" onclick="showTab('products')">Все</button></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Фото</th><th>Название</th><th class="col-hide">Цена</th><th class="col-hide">Бейдж</th><th></th></tr></thead>
+                    <tbody id="dash-prod-tbody"></tbody>
+                </table></div>
+            </div>
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">ПОСЛЕДНИЕ НОВОСТИ</span><button class="btn btn--outline btn--xs" onclick="showTab('news')">Все</button></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th class="col-hide">Дата</th><th>Заголовок</th><th class="col-hide">Теги</th><th></th></tr></thead>
+                    <tbody id="dash-news-tbody"></tbody>
+                </table></div>
+            </div>
+        </div>
+
+        <!-- ────────────── PRODUCTS ────────────── -->
+        <div class="tab-panel" id="tab-products">
+            <div class="panel" id="product-form-panel" style="display:none">
+                <div class="panel__head">
+                    <span class="panel__title" id="prod-form-title">НОВЫЙ ПРОДУКТ</span>
+                    <button class="icon-btn" onclick="hideProductForm()"><i class="fas fa-times"></i></button>
+                </div>
+                <input type="hidden" id="pf-editing-idx" value="-1">
+                <div class="form-section">
+                    <div class="form-section-title">Основная информация</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">ID (лат, дефис) *</label>
+                            <input class="form-input" id="pf-id" placeholder="sr-product-1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Тип</label>
+                            <select class="form-input" id="pf-type"><option value="robots">robots</option><option value="drones">drones</option><option value="components">components</option></select>
+                        </div>
+                        <div class="form-group span-2">
+                            <label class="form-label">Название *</label>
+                            <input class="form-input" id="pf-title" placeholder="SR-Alpha 1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Цена *</label>
+                            <input class="form-input" id="pf-price" placeholder="от 1 200 000 ₽">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Бейдж (необяз.)</label>
+                            <input class="form-input" id="pf-badge" placeholder="Хит продаж">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Описание</div>
+                    <div class="form-grid">
+                        <div class="form-group span-2">
+                            <label class="form-label">Краткое описание (в карточке) *</label>
+                            <textarea class="form-input" id="pf-short" rows="2" placeholder="Одно-два предложения…"></textarea>
+                        </div>
+                        <div class="form-group span-2">
+                            <label class="form-label">Полное описание (HTML допустим)</label>
+                            <textarea class="form-input" id="pf-desc" rows="4" placeholder="&lt;p&gt;Подробное описание…&lt;/p&gt;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Изображение</div>
+                    <div class="form-grid">
+                        <div class="form-group span-2">
+                            <label class="form-label">URL изображения</label>
+                            <input class="form-input" id="pf-image" placeholder="https://..." oninput="updateImgPreview('pf-image','pf-img-preview')">
+                        </div>
+                    </div>
+                    <div class="file-upload-area" onclick="document.getElementById('pf-image-file').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Нажмите для загрузки фото с устройства (JPG, PNG, WEBP)</span>
+                        <input type="file" id="pf-image-file" accept="image/*" onchange="handleImageUpload(this,'pf-image','pf-img-preview')">
+                    </div>
+                    <div class="img-preview" id="pf-img-preview" style="margin-top:12px" onclick="document.getElementById('pf-image').focus()">
+                        <div class="img-preview-placeholder"><i class="fas fa-image"></i><span>Введите URL или загрузите фото</span></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Характеристики</div>
+                    <div id="pf-features-list" class="features-list"></div>
+                    <button class="btn btn--outline btn--sm" type="button" onclick="addFeature()"><i class="fas fa-plus"></i> Добавить</button>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Технические данные</div>
+                    <div id="pf-specs-list" class="features-list"></div>
+                    <button class="btn btn--outline btn--sm" type="button" onclick="addSpec()"><i class="fas fa-plus"></i> Добавить строку</button>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Области применения</div>
+                    <div id="pf-apps-list" class="features-list"></div>
+                    <button class="btn btn--outline btn--sm" type="button" onclick="addApp()"><i class="fas fa-plus"></i> Добавить</button>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn--outline btn--sm" onclick="hideProductForm()">Отмена</button>
+                    <button class="btn btn--primary btn--sm" onclick="saveProduct()"><i class="fas fa-save"></i> Сохранить</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel__head">
+                    <span class="panel__title">ВСЕ ПРОДУКТЫ</span>
+                    <button class="btn btn--primary btn--sm" onclick="openProductForm()"><i class="fas fa-plus"></i> <span class="btn-label">Добавить</span></button>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Фото</th><th>Название</th><th class="col-hide">Цена</th><th class="col-hide">Тип</th><th class="col-hide">Бейдж</th><th>Действия</th></tr></thead>
+                    <tbody id="prod-tbody"></tbody>
+                </table></div>
+            </div>
+        </div>
+
+        <!-- ────────────── NEWS ────────────── -->
+        <div class="tab-panel" id="tab-news">
+            <div class="panel" id="news-form-panel" style="display:none">
+                <div class="panel__head">
+                    <span class="panel__title" id="news-form-title">НОВАЯ НОВОСТЬ</span>
+                    <button class="icon-btn" onclick="hideNewsForm()"><i class="fas fa-times"></i></button>
+                </div>
+                <input type="hidden" id="nf-editing-idx" value="-1">
+                <div class="form-section">
+                    <div class="form-section-title">Основная информация</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">ID *</label>
+                            <input class="form-input" id="nf-id" placeholder="news-4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Дата (дд.мм.гггг) *</label>
+                            <input class="form-input" id="nf-date" placeholder="01.03.2026">
+                        </div>
+                        <div class="form-group span-2">
+                            <label class="form-label">Заголовок *</label>
+                            <input class="form-input" id="nf-title" placeholder="Заголовок новости…">
+                        </div>
+                        <div class="form-group span-2">
+                            <label class="form-label">Анонс (в карточке) *</label>
+                            <textarea class="form-input" id="nf-excerpt" rows="2" placeholder="Краткое описание…"></textarea>
+                        </div>
+                        <div class="form-group span-2">
+                            <label class="form-label">Полный текст (HTML допустим) *</label>
+                            <textarea class="form-input" id="nf-content" rows="6" placeholder="&lt;p&gt;Текст новости…&lt;/p&gt;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Изображение</div>
+                    <div class="form-group">
+                        <label class="form-label">URL изображения</label>
+                        <input class="form-input" id="nf-image" placeholder="https://..." oninput="updateImgPreview('nf-image','nf-img-preview')">
+                    </div>
+                    <div class="file-upload-area" onclick="document.getElementById('nf-image-file').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Нажмите для загрузки фото с устройства (JPG, PNG, WEBP)</span>
+                        <input type="file" id="nf-image-file" accept="image/*" onchange="handleImageUpload(this,'nf-image','nf-img-preview')">
+                    </div>
+                    <div class="img-preview" id="nf-img-preview" style="aspect-ratio:16/9;margin-top:12px" onclick="document.getElementById('nf-image').focus()">
+                        <div class="img-preview-placeholder"><i class="fas fa-image"></i><span>Введите URL или загрузите фото</span></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Теги</div>
+                    <label class="form-label" style="margin-bottom:6px;display:block">Нажмите Enter после каждого тега</label>
+                    <div class="tag-input-wrap" id="nf-tags-wrap">
+                        <input class="tag-input" id="nf-tag-input" placeholder="Введите тег…" onkeydown="handleTagKey(event)">
+                    </div>
+                    <input type="hidden" id="nf-tags-data" value="[]">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn--outline btn--sm" onclick="hideNewsForm()">Отмена</button>
+                    <button class="btn btn--primary btn--sm" onclick="saveNews()"><i class="fas fa-save"></i> Сохранить</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel__head">
+                    <span class="panel__title">ВСЕ НОВОСТИ</span>
+                    <button class="btn btn--primary btn--sm" onclick="openNewsForm()"><i class="fas fa-plus"></i> <span class="btn-label">Добавить</span></button>
+                </div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Фото</th><th>Заголовок</th><th class="col-hide">Дата</th><th class="col-hide">Теги</th><th>Действия</th></tr></thead>
+                    <tbody id="news-tbody"></tbody>
+                </table></div>
+            </div>
+        </div>
+
+        <!-- ────────────── SECTIONS ────────────── -->
+        <div class="tab-panel" id="tab-sections">
+            <div class="alert alert--info"><i class="fas fa-info-circle"></i> Включите раздел — он станет полноценным. Выключите — посетители увидят «Раздел в разработке».</div>
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">РАЗДЕЛЫ САЙТА</span></div>
+                <div id="sections-list" style="padding:6px 0"></div>
+            </div>
+        </div>
+
+        <!-- ────────────── SETTINGS ────────────── -->
+        <div class="tab-panel" id="tab-settings">
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">НАСТРОЙКИ САЙТА</span></div>
+                <div class="form-section">
+                    <div class="form-section-title">Контактная информация</div>
+                    <div class="form-grid">
+                        <div class="form-group"><label class="form-label">Название компании</label><input class="form-input" id="s-name" placeholder="Smart Robotica"></div>
+                        <div class="form-group"><label class="form-label">Телефон</label><input class="form-input" id="s-phone"></div>
+                        <div class="form-group span-2"><label class="form-label">Email</label><input class="form-input" id="s-email"></div>
+                        <div class="form-group span-2"><label class="form-label">Адрес</label><input class="form-input" id="s-address"></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Социальные сети</div>
+                    <div class="form-grid">
+                        <div class="form-group"><label class="form-label">Telegram URL</label><input class="form-input" id="s-tg" placeholder="https://t.me/..."></div>
+                        <div class="form-group"><label class="form-label">VK URL</label><input class="form-input" id="s-vk" placeholder="https://vk.com/..."></div>
+                        <div class="form-group span-2"><label class="form-label">YouTube URL</label><input class="form-input" id="s-yt" placeholder="https://youtube.com/..."></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Статистика на главной</div>
+                    <div class="form-grid form-grid--3">
+                        <div class="form-group"><label class="form-label">Проектов</label><input class="form-input" type="number" id="s-stat1" value="150"></div>
+                        <div class="form-group"><label class="form-label">Патентов</label><input class="form-input" type="number" id="s-stat2" value="12"></div>
+                        <div class="form-group"><label class="form-label">Клиентов %</label><input class="form-input" type="number" id="s-stat3" value="98"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn--primary" onclick="saveSettings()"><i class="fas fa-save"></i> Сохранить</button>
+                </div>
+            </div>
+            <div class="panel" style="margin-top:24px">
+                <div class="panel__head"><span class="panel__title">СМЕНА ПАРОЛЯ</span></div>
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Текущий пароль</label>
+                            <input class="form-input" type="password" id="pw-current" placeholder="••••••">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Новый пароль</label>
+                            <input class="form-input" type="password" id="pw-new" placeholder="••••••">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn--primary" onclick="changePassword()"><i class="fas fa-lock"></i> Сменить пароль</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ────────────── BACKUP ────────────── -->
+        <div class="tab-panel" id="tab-backup">
+            <div class="alert alert--warn"><i class="fas fa-exclamation-triangle"></i> Экспортируйте данные регулярно. При очистке браузера данные будут потеряны.</div>
+
+            <!-- СИНХРОНИЗАЦИЯ НА ВСЕ УСТРОЙСТВА -->
+            <div class="panel" style="border-color:rgba(0,240,255,.3)">
+                <div class="panel__head" style="background:rgba(0,240,255,.05)">
+                    <span class="panel__title" style="color:var(--c)">📱 СИНХРОНИЗАЦИЯ НА ВСЕ УСТРОЙСТВА</span>
+                </div>
+                <div class="form-section">
+                    <div class="alert alert--info" style="margin-bottom:16px">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Почему мобильный видит старые данные?</strong><br>
+                            localStorage хранится отдельно в каждом браузере на каждом устройстве. Чтобы данные появились на телефоне — нужно скачать файл <code>cms-data.js</code> и загрузить его на хостинг рядом с <code>index.html</code>.
+                        </div>
+                    </div>
+                    <p style="color:var(--muted);margin-bottom:16px;font-size:.9rem"><strong style="color:var(--text)">Инструкция:</strong> 1) Нажмите кнопку ниже → скачается <code>cms-data.js</code>. 2) Загрузите этот файл на хостинг в корневую папку сайта (рядом с index.html). 3) Все устройства будут видеть одинаковые данные.</p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn btn--primary" onclick="exportCmsDataJs()">
+                            <i class="fas fa-rocket"></i> Скачать cms-data.js для хостинга
+                        </button>
+                        <button class="btn btn--outline btn--sm" onclick="showSyncHelp()">
+                            <i class="fas fa-question-circle"></i> Подробнее
+                        </button>
+                    </div>
+                    <div id="sync-help" style="display:none;margin-top:16px;padding:14px;background:rgba(0,240,255,.05);border:1px solid var(--border);border-radius:var(--r)">
+                        <div style="font-family:var(--fh);font-size:.6rem;letter-spacing:2px;color:var(--c);margin-bottom:10px">КАК ЭТО РАБОТАЕТ</div>
+                        <ol style="color:var(--muted);font-size:.88rem;display:flex;flex-direction:column;gap:8px;padding-left:18px">
+                            <li>Вы редактируете данные в админке → они сохраняются в localStorage вашего браузера</li>
+                            <li>Нажимаете «Скачать cms-data.js» → скачивается файл с вашими данными</li>
+                            <li>Загружаете файл на хостинг (FTP, cPanel, Netlify drag-and-drop и т.д.)</li>
+                            <li>Теперь <strong style="color:var(--text)">все браузеры и устройства</strong> читают данные из этого файла</li>
+                            <li>При следующих изменениях — повторите шаги 2-3</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">РЕЗЕРВНАЯ КОПИЯ (JSON)</span></div>
+                <div class="form-section">
+                    <p style="color:var(--muted);margin-bottom:16px;font-size:.9rem">Скачайте полную резервную копию всех данных CMS в формате JSON.</p>
+                    <button class="btn btn--primary" onclick="exportAll()"><i class="fas fa-download"></i> Скачать резервную копию</button>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel__head"><span class="panel__title">ИМПОРТ ДАННЫХ</span></div>
+                <div class="form-section">
+                    <p style="color:var(--muted);margin-bottom:16px;font-size:.9rem">Загрузите резервную копию. Текущие данные будут перезаписаны.</p>
+                    <div class="form-group">
+                        <label class="form-label">Файл резервной копии (.json)</label>
+                        <input class="form-input" type="file" id="import-file" accept=".json" onchange="importData(this)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Delete confirm modal -->
+<div class="overlay" id="confirm-overlay">
+    <div class="modal-box modal-box--sm">
+        <div class="modal-head"><h3>ПОДТВЕРДИТЕ УДАЛЕНИЕ</h3></div>
+        <div class="modal-body"><p id="confirm-text" style="color:var(--muted)">Вы уверены?</p></div>
+        <div class="modal-foot">
+            <button class="btn btn--outline btn--sm" onclick="closeOverlay('confirm-overlay')">Отмена</button>
+            <button class="btn btn--danger btn--sm" id="confirm-ok"><i class="fas fa-trash"></i> Удалить</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ── STORAGE ─────────────────────────────────────────────────
+const KEYS={PRODUCTS:'sr_products',NEWS:'sr_news',SETTINGS:'sr_settings',SECTIONS:'sr_sections'};
+
+function defaultProducts(){return[{id:'sr-alpha-1',type:'robots',title:'SR-Alpha 1',price:'от 1 200 000 ₽',badge:'Хит продаж',image:'https://placehold.co/400x320/09091c/00F0FF?text=SR-Alpha+1',shortDescription:'Многофункциональный робот-ассистент для промышленных предприятий.',description:'<p>SR-Alpha 1 — флагманский промышленный манипулятор с 6 степенями свободы.</p>',features:['6-осевой манипулятор','Грузоподъёмность до 10 кг','Точность ±0.05 мм'],specifications:{'Высота':'1.2 м','Масса':'48 кг','Питание':'24В DC','Гарантия':'3 года'},applications:['Производство','Логистика','Медицина']},{id:'sr-sentry-2',type:'robots',title:'SR-Sentry 2',price:'от 890 000 ₽',badge:'Новинка',image:'https://placehold.co/400x320/09091c/BC13FE?text=SR-Sentry+2',shortDescription:'Автономная охранная платформа с ИИ-распознаванием лиц.',description:'<p>SR-Sentry 2 обеспечивает охрану периметра без участия человека.</p>',features:['360° обзор','ИИ-распознавание','Автономный патруль'],specifications:{'Скорость':'до 5 км/ч','Батарея':'12 часов','Масса':'32 кг'},applications:['Охрана','Склады']},{id:'sr-drone-x3',type:'robots',title:'SR-Drone X3',price:'от 450 000 ₽',badge:null,image:'https://placehold.co/400x320/09091c/00F0FF?text=SR-Drone+X3',shortDescription:'Профессиональный БПЛА для мониторинга и доставки.',description:'<p>SR-Drone X3 — промышленная платформа.</p>',features:['Полёт до 40 мин','Дальность 7 км','IP54'],specifications:{'Дальность':'7 км','Нагрузка':'3 кг'},applications:['Мониторинг','Доставка']},{id:'sr-home',type:'robots',title:'SR-Home',price:'от 120 000 ₽',badge:null,image:'https://placehold.co/400x320/09091c/BC13FE?text=SR-Home',shortDescription:'Умный домашний помощник с голосовым управлением.',description:'<p>SR-Home — ваш персональный робот-ассистент.</p>',features:['Голосовой интерфейс','Навигация SLAM'],specifications:{'Высота':'90 см','Батарея':'8 часов'},applications:['Быт','Умный дом']}];}
+function defaultNews(){return[{id:'news-1',date:'15.02.2026',title:'SR-Alpha 2 установил рекорд производительности',excerpt:'Новая модель побила мировой рекорд по скорости сборки микросхем.',image:'https://placehold.co/640x360/09091c/00F0FF?text=Record',content:'<p>SR-Alpha 2: 2400 операций/час при точности 0.01 мм.</p>',tags:['Достижения','SR-Alpha']},{id:'news-2',date:'02.02.2026',title:'Партнёрство с медицинскими центрами',excerpt:'Smart Robotica подписала соглашения с 15 клиниками.',image:'https://placehold.co/640x360/09091c/BC13FE?text=Medical',content:'<p>Стратегические соглашения с 15 медцентрами.</p>',tags:['Партнёрство','Медицина']},{id:'news-3',date:'18.01.2026',title:'Smart Robotica на CES 2026',excerpt:'Три новинки и две награды.',image:'https://placehold.co/640x360/09091c/00F0FF?text=CES+2026',content:'<p>Получены «Best Innovation» и «Editors Choice».</p>',tags:['Выставка','CES','Награды']}];}
+function defaultSections(){return[{id:'career',label:'Карьера',active:false,desc:'Раздел с вакансиями и условиями работы'},{id:'partners',label:'Партнёры',active:false,desc:'Информация для дистрибьюторов'},{id:'privacy',label:'Политика конфиденц.',active:false,desc:'Политика конфиденциальности'},{id:'terms',label:'Условия использования',active:false,desc:'Пользовательское соглашение'}];}
+
+function load(key,def){try{const r=localStorage.getItem(key);if(r){const p=JSON.parse(r);if(Array.isArray(p)&&p.length)return p;}}catch{}return def();}
+function save(key,data){try{localStorage.setItem(key,JSON.stringify(data));}catch{}}
+
+let products=load(KEYS.PRODUCTS,defaultProducts);
+let news=load(KEYS.NEWS,defaultNews);
+let sections=load(KEYS.SECTIONS,defaultSections);
+let settings={};try{settings=JSON.parse(localStorage.getItem(KEYS.SETTINGS)||'{}');}catch{}
+
+// ── SIDEBAR (MOBILE) ───────────────────────────────────────
+const sbEl=document.getElementById('sidebar');
+const sbBackdrop=document.getElementById('sb-backdrop');
+const sbToggle=document.getElementById('sb-toggle');
+
+function openSidebar(){
+    sbEl.classList.add('open');
+    sbBackdrop.classList.add('show');
+    document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+    sbEl.classList.remove('open');
+    sbBackdrop.classList.remove('show');
+    document.body.style.overflow='';
+}
+
+sbToggle?.addEventListener('click',()=>sbEl.classList.contains('open')?closeSidebar():openSidebar());
+sbBackdrop?.addEventListener('click',closeSidebar);
+
+// ── TABS ───────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+        showTab(item.dataset.tab);
+        if(window.innerWidth<=900)closeSidebar(); // закрыть меню после выбора
+    });
+});
+function showTab(tab){
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    document.getElementById('tab-'+tab)?.classList.add('active');
+    document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+    document.getElementById('topbar-title').textContent=tab.toUpperCase();
+    renderAll();
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function toast(msg,type='ok'){
+    const c=document.getElementById('toast-container');
+    const t=document.createElement('div');
+    t.className=`toast toast--${type}`;
+    t.innerHTML=`<i class="fas ${type==='ok'?'fa-check-circle':'fa-exclamation-circle'}"></i><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(()=>{t.style.transition='.3s';t.style.opacity='0';t.style.transform='translateX(16px)';setTimeout(()=>t.remove(),350);},3000);
+}
+
+// ── IMG PREVIEW ────────────────────────────────────────────
+function updateImgPreview(inputId,previewId){
+    const url=document.getElementById(inputId)?.value.trim();
+    const wrap=document.getElementById(previewId);
+    if(!wrap)return;
+    if(url){
+        wrap.innerHTML=`<img src="${url}" alt="preview" onerror="this.parentElement.innerHTML='<div class=\\"img-preview-placeholder\\"><i class=\\"fas fa-exclamation-circle\\"></i><span>Ошибка загрузки</span></div>'">`;
+    }else{
+        wrap.innerHTML='<div class="img-preview-placeholder"><i class="fas fa-image"></i><span>Введите URL выше</span></div>';
+    }
+}
+
+// ── RENDER ─────────────────────────────────────────────────
+function renderAll(){renderDashboard();renderProductsTable();renderNewsTable();renderSections();loadSettings();updateBadges();}
+
+function updateBadges(){
+    const p=document.getElementById('nav-prod-count');if(p)p.textContent=products.length;
+    const n=document.getElementById('nav-news-count');if(n)n.textContent=news.length;
+}
+
+function renderDashboard(){
+    const cartData=JSON.parse(localStorage.getItem('sr_cart')||'[]');
+    const cartCount=cartData.reduce((s,i)=>s+(i.qty||0),0);
+    const activeSec=sections.filter(s=>s.active).length;
+    set('ds-prod',products.length);set('ds-news',news.length);set('ds-cart',cartCount);set('ds-sec',activeSec);
+    const pt=document.getElementById('dash-prod-tbody');
+    if(pt)pt.innerHTML=products.slice(0,4).map((p,i)=>`
+        <tr><td><img class="td-img" src="${p.image}" alt="${p.title}" onerror="this.src='https://placehold.co/52x40/09091c/555?text=?'"></td>
+        <td class="td-title">${p.title}</td>
+        <td class="col-hide">${p.price}</td>
+        <td class="col-hide">${p.badge?`<span class="badge badge--cyan">${p.badge}</span>`:'<span class="badge badge--gray">—</span>'}</td>
+        <td><button class="icon-btn" onclick="showTab('products');openProductForm(${i})"><i class="fas fa-pen"></i></button></td></tr>`).join('');
+    const nt=document.getElementById('dash-news-tbody');
+    if(nt)nt.innerHTML=news.slice(0,4).map((n,i)=>`
+        <tr><td class="col-hide" style="white-space:nowrap;color:var(--m)">${n.date}</td>
+        <td class="td-title">${n.title}</td>
+        <td class="col-hide">${(n.tags||[]).slice(0,2).map(t=>`<span class="badge badge--mag">${t}</span>`).join(' ')}</td>
+        <td><button class="icon-btn" onclick="showTab('news');openNewsForm(${i})"><i class="fas fa-pen"></i></button></td></tr>`).join('');
+}
+
+function renderProductsTable(){
+    const tbody=document.getElementById('prod-tbody');if(!tbody)return;
+    tbody.innerHTML=products.length?products.map((p,i)=>`
+        <tr>
+            <td><img class="td-img" src="${p.image}" alt="${p.title}" onerror="this.src='https://placehold.co/52x40/09091c/555?text=?'"></td>
+            <td class="td-title">${p.title}</td>
+            <td class="col-hide">${p.price}</td>
+            <td class="col-hide"><span class="badge badge--mag">${p.type}</span></td>
+            <td class="col-hide">${p.badge?`<span class="badge badge--cyan">${p.badge}</span>`:'<span class="badge badge--gray">—</span>'}</td>
+            <td class="td-actions">
+                <button class="icon-btn" onclick="openProductForm(${i})"><i class="fas fa-pen"></i></button>
+                <button class="icon-btn danger" onclick="confirmDelete('product',${i})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`).join('')
+    :`<tr><td colspan="6" class="no-data">Продуктов нет — добавьте первый!</td></tr>`;
+}
+
+function renderNewsTable(){
+    const tbody=document.getElementById('news-tbody');if(!tbody)return;
+    tbody.innerHTML=news.length?news.map((n,i)=>`
+        <tr>
+            <td><img class="td-img" src="${n.image}" alt="${n.title}" style="aspect-ratio:16/9" onerror="this.src='https://placehold.co/52x40/09091c/555?text=?'"></td>
+            <td class="td-title">${n.title}</td>
+            <td class="col-hide" style="white-space:nowrap;color:var(--m)">${n.date}</td>
+            <td class="col-hide">${(n.tags||[]).map(t=>`<span class="badge badge--mag">${t}</span>`).join(' ')}</td>
+            <td class="td-actions">
+                <button class="icon-btn" onclick="openNewsForm(${i})"><i class="fas fa-pen"></i></button>
+                <button class="icon-btn danger" onclick="confirmDelete('news',${i})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`).join('')
+    :`<tr><td colspan="5" class="no-data">Новостей нет!</td></tr>`;
+}
+
+function renderSections(){
+    const el=document.getElementById('sections-list');if(!el)return;
+    el.innerHTML=sections.map((s,i)=>`
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border)">
+            <label class="switch"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSection(${i},this.checked)"><span class="switch__track"></span></label>
+            <div style="flex:1;min-width:0">
+                <div style="font-family:var(--fh);font-size:.8rem;letter-spacing:1px;margin-bottom:3px">${s.label}</div>
+                <div style="font-size:.82rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc}</div>
+            </div>
+            <span class="badge ${s.active?'badge--green':'badge--gray'}" style="flex-shrink:0">${s.active?'Активен':'В разработке'}</span>
+        </div>`).join('');
+}
+
+function toggleSection(i,val){sections[i].active=val;save(KEYS.SECTIONS,sections);renderSections();updateBadges();toast(val?`"${sections[i].label}" включён`:`"${sections[i].label}" выключен`);}
+
+// ── PRODUCTS CRUD ──────────────────────────────────────────
+function openProductForm(idx=-1){
+    document.getElementById('pf-editing-idx').value=idx;
+    document.getElementById('prod-form-title').textContent=idx>=0?'РЕДАКТИРОВАТЬ ПРОДУКТ':'НОВЫЙ ПРОДУКТ';
+    const p=idx>=0?products[idx]:{};
+    document.getElementById('pf-id').value=p.id||genId('sr');
+    document.getElementById('pf-type').value=p.type||'robots';
+    document.getElementById('pf-title').value=p.title||'';
+    document.getElementById('pf-price').value=p.price||'';
+    document.getElementById('pf-badge').value=p.badge||'';
+    document.getElementById('pf-image').value=p.image||'';
+    document.getElementById('pf-short').value=p.shortDescription||'';
+    document.getElementById('pf-desc').value=p.description||'';
+    updateImgPreview('pf-image','pf-img-preview');
+    renderFeaturesList('pf-features-list',p.features||[]);
+    renderSpecsList('pf-specs-list',p.specifications||{});
+    renderAppsList('pf-apps-list',p.applications||[]);
+    document.getElementById('product-form-panel').style.display='';
+    document.getElementById('product-form-panel').scrollIntoView({behavior:'smooth'});
+}
+function hideProductForm(){document.getElementById('product-form-panel').style.display='none';}
+function saveProduct(){
+    const idx=parseInt(document.getElementById('pf-editing-idx').value);
+    const id=document.getElementById('pf-id').value.trim();
+    const title=document.getElementById('pf-title').value.trim();
+    const price=document.getElementById('pf-price').value.trim();
+    if(!id||!title||!price){toast('Заполните ID, Название, Цену','err');return;}
+    const item={id,type:document.getElementById('pf-type').value,title,price,
+        badge:document.getElementById('pf-badge').value.trim()||null,
+        image:document.getElementById('pf-image').value.trim()||`https://placehold.co/400x320/09091c/00F0FF?text=${encodeURIComponent(title)}`,
+        shortDescription:document.getElementById('pf-short').value.trim(),
+        description:document.getElementById('pf-desc').value.trim(),
+        features:collectList('pf-features-list'),specifications:collectSpecs('pf-specs-list'),applications:collectList('pf-apps-list')};
+    if(idx>=0)products[idx]=item;else products.push(item);
+    save(KEYS.PRODUCTS,products);renderAll();hideProductForm();
+    toast(idx>=0?'Продукт обновлён!':'Продукт добавлен!');
+}
+
+function renderFeaturesList(cid,arr){const el=document.getElementById(cid);if(!el)return;el.innerHTML=arr.map((v,i)=>featureRow(cid,v,i)).join('');}
+function featureRow(cid,val,idx){return`<div class="feature-row" id="${cid}-row-${idx}"><input class="form-input" value="${escHtml(val)}" placeholder="Характеристика…"><button class="icon-btn danger" type="button" onclick="document.getElementById('${cid}-row-${idx}').remove()"><i class="fas fa-times"></i></button></div>`;}
+function addFeature(){const el=document.getElementById('pf-features-list');el.insertAdjacentHTML('beforeend',featureRow('pf-features-list','',el.children.length));}
+
+function renderSpecsList(cid,obj){const el=document.getElementById(cid);if(!el)return;el.innerHTML=Object.entries(obj).map(([k,v],i)=>specRow(cid,k,v,i)).join('');}
+function specRow(cid,k,v,idx){return`<div class="feature-row" id="${cid}-row-${idx}"><input class="form-input" value="${escHtml(k)}" placeholder="Параметр" style="flex:.5"><input class="form-input" value="${escHtml(v)}" placeholder="Значение"><button class="icon-btn danger" type="button" onclick="document.getElementById('${cid}-row-${idx}').remove()"><i class="fas fa-times"></i></button></div>`;}
+function addSpec(){const el=document.getElementById('pf-specs-list');el.insertAdjacentHTML('beforeend',specRow('pf-specs-list','','',el.children.length));}
+
+function renderAppsList(cid,arr){const el=document.getElementById(cid);if(!el)return;el.innerHTML=arr.map((v,i)=>appRow(cid,v,i)).join('');}
+function appRow(cid,val,idx){return`<div class="feature-row" id="${cid}-row-${idx}"><input class="form-input" value="${escHtml(val)}" placeholder="Область применения…"><button class="icon-btn danger" type="button" onclick="document.getElementById('${cid}-row-${idx}').remove()"><i class="fas fa-times"></i></button></div>`;}
+function addApp(){const el=document.getElementById('pf-apps-list');el.insertAdjacentHTML('beforeend',appRow('pf-apps-list','',el.children.length));}
+
+function collectList(cid){return[...document.querySelectorAll(`#${cid} input`)].map(i=>i.value.trim()).filter(Boolean);}
+function collectSpecs(cid){const res={};document.querySelectorAll(`#${cid} .feature-row`).forEach(r=>{const inp=r.querySelectorAll('input');const k=inp[0]?.value.trim();const v=inp[1]?.value.trim();if(k&&v)res[k]=v;});return res;}
+
+// ── NEWS CRUD ──────────────────────────────────────────────
+function openNewsForm(idx=-1){
+    document.getElementById('nf-editing-idx').value=idx;
+    document.getElementById('news-form-title').textContent=idx>=0?'РЕДАКТИРОВАТЬ НОВОСТЬ':'НОВАЯ НОВОСТЬ';
+    const n=idx>=0?news[idx]:{};
+    document.getElementById('nf-id').value=n.id||genId('news');
+    document.getElementById('nf-date').value=n.date||todayStr();
+    document.getElementById('nf-title').value=n.title||'';
+    document.getElementById('nf-excerpt').value=n.excerpt||'';
+    document.getElementById('nf-content').value=n.content||'';
+    document.getElementById('nf-image').value=n.image||'';
+    updateImgPreview('nf-image','nf-img-preview');
+    const tags=n.tags||[];
+    document.getElementById('nf-tags-data').value=JSON.stringify(tags);
+    renderTags(tags);
+    document.getElementById('news-form-panel').style.display='';
+    document.getElementById('news-form-panel').scrollIntoView({behavior:'smooth'});
+}
+function hideNewsForm(){document.getElementById('news-form-panel').style.display='none';}
+function saveNews(){
+    const idx=parseInt(document.getElementById('nf-editing-idx').value);
+    const id=document.getElementById('nf-id').value.trim();
+    const title=document.getElementById('nf-title').value.trim();
+    const excerpt=document.getElementById('nf-excerpt').value.trim();
+    const content=document.getElementById('nf-content').value.trim();
+    if(!id||!title||!excerpt||!content){toast('Заполните обязательные поля','err');return;}
+    let tags=[];try{tags=JSON.parse(document.getElementById('nf-tags-data').value||'[]');}catch{}
+    const item={id,date:document.getElementById('nf-date').value.trim()||todayStr(),title,excerpt,content,image:document.getElementById('nf-image').value.trim()||'',tags};
+    if(idx>=0)news[idx]=item;else news.push(item);
+    save(KEYS.NEWS,news);renderAll();hideNewsForm();
+    toast(idx>=0?'Новость обновлена!':'Новость добавлена!');
+}
+
+function renderTags(tags){
+    const wrap=document.getElementById('nf-tags-wrap');if(!wrap)return;
+    const input=document.getElementById('nf-tag-input');
+    wrap.querySelectorAll('.tag-chip').forEach(t=>t.remove());
+    tags.forEach((tag,i)=>{const chip=document.createElement('div');chip.className='tag-chip';chip.innerHTML=`<span>${tag}</span><button type="button" onclick="removeTag(${i})">×</button>`;wrap.insertBefore(chip,input);});
+    document.getElementById('nf-tags-data').value=JSON.stringify(tags);
+}
+function handleTagKey(e){
+    if(e.key==='Enter'||e.key===','){e.preventDefault();const val=e.target.value.trim().replace(/,$/,'');if(!val)return;let tags=[];try{tags=JSON.parse(document.getElementById('nf-tags-data').value||'[]');}catch{}if(!tags.includes(val))tags.push(val);renderTags(tags);e.target.value='';}
+}
+function removeTag(i){let tags=[];try{tags=JSON.parse(document.getElementById('nf-tags-data').value||'[]');}catch{}tags.splice(i,1);renderTags(tags);}
+
+// ── DELETE ─────────────────────────────────────────────────
+let _pendingDelete=null;
+function confirmDelete(type,idx){
+    document.getElementById('confirm-text').textContent=`Удалить ${type==='product'?`продукт "${products[idx]?.title}"`:`новость "${news[idx]?.title}"`}? Это необратимо.`;
+    _pendingDelete={type,idx};openOverlay('confirm-overlay');
+}
+document.getElementById('confirm-ok').onclick=function(){
+    if(!_pendingDelete)return;
+    const{type,idx}=_pendingDelete;
+    if(type==='product')products.splice(idx,1);else news.splice(idx,1);
+    save(type==='product'?KEYS.PRODUCTS:KEYS.NEWS,type==='product'?products:news);
+    renderAll();closeOverlay('confirm-overlay');toast('Удалено!');_pendingDelete=null;
+};
+
+// ── SETTINGS ───────────────────────────────────────────────
+function loadSettings(){
+    set('s-name',settings.name||'Smart Robotica','value');
+    set('s-phone',settings.phone||'+7 (915) 426-30-08','value');
+    set('s-email',settings.email||'info@smartrobotica.ru','value');
+    set('s-address',settings.address||'Москва, ул. Инновационная, 42','value');
+    set('s-tg',settings.tg||'','value');set('s-vk',settings.vk||'','value');set('s-yt',settings.yt||'','value');
+    set('s-stat1',settings.stat1||150,'value');set('s-stat2',settings.stat2||12,'value');set('s-stat3',settings.stat3||98,'value');
+}
+function saveSettings(){
+    settings={name:getVal('s-name'),phone:getVal('s-phone'),email:getVal('s-email'),address:getVal('s-address'),tg:getVal('s-tg'),vk:getVal('s-vk'),yt:getVal('s-yt'),stat1:getVal('s-stat1'),stat2:getVal('s-stat2'),stat3:getVal('s-stat3')};
+    save(KEYS.SETTINGS,settings);toast('Настройки сохранены!');
+}
+
+// ── OVERLAYS ───────────────────────────────────────────────
+function openOverlay(id){document.getElementById(id)?.classList.add('open');}
+function closeOverlay(id){document.getElementById(id)?.classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('open');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));closeSidebar();}});
+
+// ── BACKUP ─────────────────────────────────────────────────
+function exportAll(){
+    const data={products,news,sections,settings,exported:new Date().toISOString()};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`sr-cms-backup-${Date.now()}.json`;a.click();URL.revokeObjectURL(url);
+    toast('Резервная копия скачана!');
+}
+
+// Экспорт cms-data.js — файл для загрузки на хостинг
+// После загрузки этого файла рядом с index.html все устройства видят одинаковые данные
+function exportCmsDataJs(){
+    const data={products,news,sections,settings};
+    const content=`/* cms-data.js — автоматически сгенерировано CMS Smart Robotica
+   Дата: ${new Date().toLocaleString('ru-RU')}
+   Загрузите этот файл на хостинг рядом с index.html */
+
+window.CMS_DATA = ${JSON.stringify(data, null, 2)};
+`;
+    const blob=new Blob([content],{type:'application/javascript'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='cms-data.js';a.click();URL.revokeObjectURL(url);
+    toast('Файл cms-data.js скачан! Загрузите его на хостинг.');
+}
+
+function showSyncHelp(){
+    const el=document.getElementById('sync-help');
+    if(el)el.style.display=el.style.display==='none'?'block':'none';
+}
+function importData(input){
+    const file=input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{try{const data=JSON.parse(e.target.result);if(data.products){products=data.products;save(KEYS.PRODUCTS,products);}if(data.news){news=data.news;save(KEYS.NEWS,news);}if(data.sections){sections=data.sections;save(KEYS.SECTIONS,sections);}if(data.settings){settings=data.settings;save(KEYS.SETTINGS,settings);}renderAll();toast('Данные импортированы!');}catch{toast('Ошибка парсинга файла','err');}};
+    reader.readAsText(file);
+}
+function clearAll(){if(!confirm('Сбросить все данные к значениям по умолчанию?'))return;[KEYS.PRODUCTS,KEYS.NEWS,KEYS.SECTIONS,KEYS.SETTINGS,'sr_cart'].forEach(k=>localStorage.removeItem(k));products=defaultProducts();news=defaultNews();sections=defaultSections();settings={};renderAll();toast('Данные сброшены');}
+
+// ── HELPERS ────────────────────────────────────────────────
+function set(id,val,prop='textContent'){const el=document.getElementById(id);if(el)el[prop]=val;}
+function getVal(id){return document.getElementById(id)?.value||'';}
+function genId(prefix){return prefix+'-'+Date.now().toString(36);}
+function todayStr(){return new Date().toLocaleDateString('ru-RU');}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── AUTH ───────────────────────────────────────────────────
+const AUTH_KEY='sr_admin_pass';
+function getStoredPass(){return localStorage.getItem(AUTH_KEY)||'12345';}
+function checkLogin(){if(sessionStorage.getItem('sr_authed')==='1')document.getElementById('login-screen').style.display='none';}
+function doLogin(){
+    const user=document.getElementById('login-user').value.trim();
+    const pass=document.getElementById('login-pass').value;
+    const err=document.getElementById('login-error');
+    if(user.toLowerCase()==='admin'&&pass===getStoredPass()){
+        sessionStorage.setItem('sr_authed','1');document.getElementById('login-screen').style.display='none';err.classList.remove('show');
+    }else{err.classList.add('show');document.getElementById('login-pass').value='';document.getElementById('login-pass').focus();}
+}
+document.getElementById('login-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('login-user')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
+document.getElementById('logout-link')?.addEventListener('click',e=>{e.preventDefault();sessionStorage.removeItem('sr_authed');location.reload();});
+function changePassword(){
+    const cur=document.getElementById('pw-current').value;
+    const nw=document.getElementById('pw-new').value.trim();
+    if(cur!==getStoredPass()){toast('Текущий пароль неверный','err');return;}
+    if(nw.length<4){toast('Минимум 4 символа','err');return;}
+    localStorage.setItem(AUTH_KEY,nw);
+    document.getElementById('pw-current').value='';document.getElementById('pw-new').value='';
+    toast('Пароль успешно изменён!');
+}
+
+// ── IMAGE UPLOAD ───────────────────────────────────────────
+function handleImageUpload(input,imageInputId,previewId){
+    const file=input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{const dataUrl=e.target.result;const imageInput=document.getElementById(imageInputId);if(imageInput)imageInput.value=dataUrl;const wrap=document.getElementById(previewId);if(wrap)wrap.innerHTML=`<img src="${dataUrl}" alt="preview" style="width:100%;height:100%;object-fit:cover">`;};
+    reader.readAsDataURL(file);
+}
+
+// ── INIT ───────────────────────────────────────────────────
+checkLogin();
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+Index · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Smart Robotica | Будущее уже здесь</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+</head>
+<body>
+
+    <div class="scanline" aria-hidden="true"></div>
+
+    <!-- HEADER -->
+    <header class="header" id="header">
+        <div class="header__inner">
+            <a href="#hero" class="logo">
+                <img src="logo.png" alt="Smart Robotica" class="logo__img">
+                <span class="logo__text gradient-text">SMART ROBOTICA</span>
+            </a>
+
+            <div class="header__actions">
+                <button id="rent-btn" class="btn btn--outline btn--small">
+                    <i class="fas fa-handshake"></i> Аренда
+                </button>
+                <button class="cart-btn" id="cart-btn" aria-label="Корзина">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cart-count" aria-live="polite">0</span>
+                </button>
+                <button class="burger" id="burger" aria-label="Меню" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAV OVERLAY — вынесен из header чтобы не блокировать кнопки шапки -->
+    <nav id="nav" class="nav" role="navigation" aria-label="Главное меню">
+        <!-- Основные ссылки — видны и на десктопе и в бургере -->
+        <a href="#hero"     class="nav__link">Главная</a>
+        <a href="#products" class="nav__link">Каталог</a>
+        <a href="#news"     class="nav__link">Новости</a>
+        <a href="#about"    class="nav__link">О нас</a>
+        <!-- Дополнительные ссылки — только в бургер-меню -->
+        <a href="#" class="nav__link nav__link--mobile-only js-wip" data-section="career">Карьера</a>
+        <a href="#" class="nav__link nav__link--mobile-only js-wip" data-section="partners">Партнёры</a>
+        <a href="#" class="nav__link nav__link--mobile-only nav__link--action" id="nav-rent-btn">
+            <i class="fas fa-handshake"></i> Аренда
+        </a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <canvas id="particleCanvas" class="hero__canvas" aria-hidden="true"></canvas>
+        <div class="orb orb--1" aria-hidden="true"></div>
+        <div class="orb orb--2" aria-hidden="true"></div>
+        <div class="hero__container">
+            <div class="hero__content">
+                <span class="hero__tag">
+                    <span class="hero__tag-dot"></span>АВТОНОМНЫЕ СИСТЕМЫ
+                </span>
+                <h1 class="hero__title">
+                    <span class="glitch" data-text="ИНТЕЛЛЕКТ">ИНТЕЛЛЕКТ</span><br>
+                    <span class="gradient-text">НОВОГО</span><br>
+                    ПОКОЛЕНИЯ
+                </h1>
+                <p class="hero__subtitle">Разработка автономных роботизированных систем для бизнеса и дома. Технологии, которые меняют мир.</p>
+                <div class="hero__actions">
+                    <a href="#products" class="btn btn--primary">
+                        <i class="fas fa-robot"></i> Смотреть каталог
+                    </a>
+                    <button id="rent-hero-btn" class="btn btn--outline">
+                        <i class="fas fa-handshake"></i> Аренда
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero__visual" aria-hidden="true">
+                <div class="robot-scene">
+                    <div class="robot-ring robot-ring--1"></div>
+                    <div class="robot-ring robot-ring--2"></div>
+                    <div class="robot-ring robot-ring--3"></div>
+                    <div class="robot-core">
+                        <svg viewBox="0 0 220 270" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="55" y="10" width="110" height="85" rx="12" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                            <rect x="70" y="28" width="34" height="22" rx="6" fill="#00F0FF" opacity="0.9"><animate attributeName="opacity" values="0.9;0.4;0.9" dur="2.4s" repeatCount="indefinite"/></rect>
+                            <rect x="116" y="28" width="34" height="22" rx="6" fill="#BC13FE" opacity="0.9"><animate attributeName="opacity" values="0.9;0.5;0.9" dur="1.8s" repeatCount="indefinite"/></rect>
+                            <rect x="70" y="62" width="80" height="6" rx="3" fill="#00F0FF" opacity="0.25"/>
+                            <line x1="55" y1="52" x2="38" y2="52" stroke="#00F0FF" stroke-width="1.5"/>
+                            <circle cx="33" cy="52" r="4" fill="#00F0FF" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.5s" repeatCount="indefinite"/></circle>
+                            <line x1="165" y1="52" x2="182" y2="52" stroke="#00F0FF" stroke-width="1.5"/>
+                            <circle cx="187" cy="52" r="4" fill="#BC13FE" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.2s" repeatCount="indefinite"/></circle>
+                            <rect x="90" y="95" width="40" height="14" rx="4" fill="#08081a" stroke="#BC13FE" stroke-width="1"/>
+                            <rect x="35" y="109" width="150" height="115" rx="10" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                            <rect x="50" y="124" width="120" height="65" rx="6" fill="#050510" stroke="#BC13FE" stroke-width="0.8" opacity="0.8"/>
+                            <circle cx="75" cy="145" r="7" fill="#00F0FF" opacity="0.8"><animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/></circle>
+                            <circle cx="95" cy="145" r="5" fill="#BC13FE" opacity="0.6"/>
+                            <rect x="110" y="139" width="48" height="12" rx="3" fill="#00F0FF" opacity="0.1"/>
+                            <rect x="113" y="143" width="20" height="4" rx="2" fill="#00F0FF" opacity="0.6"><animate attributeName="width" values="20;38;20" dur="3s" repeatCount="indefinite"/></rect>
+                            <rect x="50" y="156" width="28" height="4" rx="2" fill="#BC13FE" opacity="0.4"/>
+                            <rect x="50" y="164" width="45" height="3" rx="2" fill="#00F0FF" opacity="0.3"/>
+                            <circle cx="35" cy="119" r="10" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                            <circle cx="185" cy="119" r="10" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                            <rect x="10" y="124" width="26" height="80" rx="8" fill="#08081a" stroke="#BC13FE" stroke-width="1"/>
+                            <rect x="184" y="124" width="26" height="80" rx="8" fill="#08081a" stroke="#BC13FE" stroke-width="1"/>
+                            <rect x="12" y="200" width="22" height="20" rx="5" fill="#08081a" stroke="#00F0FF" stroke-width="1"/>
+                            <rect x="186" y="200" width="22" height="20" rx="5" fill="#08081a" stroke="#00F0FF" stroke-width="1"/>
+                            <rect x="58" y="224" width="42" height="30" rx="6" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                            <rect x="120" y="224" width="42" height="30" rx="6" fill="#08081a" stroke="#00F0FF" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="robot-glow"></div>
+                </div>
+            </div>
+        </div>
+        <a href="#products" class="hero__scroll-hint" aria-label="Листать вниз">
+            <span>SCROLL</span>
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="products" id="products">
+        <div class="section-wrap">
+            <div class="section__header">
+                <span class="section__tag">КАТАЛОГ</span>
+                <h2 class="section-title">НАШИ <span class="gradient-text">РЕШЕНИЯ</span></h2>
+                <p class="section__desc">Передовые роботизированные системы для любых задач</p>
+            </div>
+            <div class="products__grid" data-cms="products" data-type="robots">
+                <div class="loading"><div class="loading-spinner"></div><p>Загружаем каталог…</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEWS -->
+    <section class="news-section" id="news">
+        <div class="section-wrap">
+            <div class="section__header">
+                <span class="section__tag">МЕДИА</span>
+                <h2 class="section-title">НОВОСТИ &amp; <span class="gradient-text">СОБЫТИЯ</span></h2>
+                <p class="section__desc">Следите за последними разработками и анонсами</p>
+            </div>
+            <div class="news__grid" data-cms="news">
+                <div class="loading"><div class="loading-spinner"></div><p>Загружаем новости…</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+        <div class="section-wrap">
+            <div class="about__inner">
+                <div class="about__content">
+                    <span class="section__tag">О НАС</span>
+                    <h2 class="section-title" style="text-align:left">О <span class="gradient-text">КОМПАНИИ</span></h2>
+                    <div class="about__text">
+                        <p>Smart Robotica — команда инженеров и визионеров. Мы создаём технологии, стирающие грань между человеком и машиной.</p>
+                        <p>Наши решения применяются в логистике, медицине, сельском хозяйстве и быту. Каждый продукт — результат сотен часов исследований.</p>
+                    </div>
+                    <ul class="about__facts">
+                        <li><i class="fas fa-check-circle"></i> Собственное производство в России</li>
+                        <li><i class="fas fa-check-circle"></i> 12 зарегистрированных патентов</li>
+                        <li><i class="fas fa-check-circle"></i> Сертификация ISO 9001:2015</li>
+                        <li><i class="fas fa-check-circle"></i> Гарантия 3 года на все изделия</li>
+                    </ul>
+                    <button id="about-contact-btn" class="btn btn--primary">Связаться с нами</button>
+                </div>
+                <div class="about__visual">
+                    <div class="about__img-frame">
+                        <img src="https://placehold.co/560x440/050510/00F0FF?text=Team+Lab" alt="Команда Smart Robotica" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="section-wrap">
+            <div class="footer__top">
+                <div class="footer__brand">
+                    <a href="#hero" class="logo footer__logo">
+                        <img src="logo.png" alt="Smart Robotica" class="logo__img logo__img--footer">
+                        <span class="logo__text gradient-text">SMART ROBOTICA</span>
+                    </a>
+                    <p>Технологии завтрашнего дня — доступны уже сегодня.</p>
+                    <div class="footer__socials">
+                        <a href="#" class="social-link" aria-label="Telegram">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.088 13.3l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.832.942z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="ВКонтакте">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.585-1.496c.596-.19 1.362 1.26 2.174 1.815.614.418 1.08.326 1.08.326l2.17-.03s1.134-.07.597-1.006c-.044-.074-.312-.658-1.61-1.861-1.36-1.258-1.178-1.054.46-3.23.999-1.328 1.398-2.14 1.272-2.487-.12-.331-.854-.243-.854-.243l-2.442.015s-.181-.025-.315.057c-.132.08-.216.267-.216.267s-.386 1.03-.902 1.906c-1.086 1.845-1.52 1.943-1.698 1.828-.413-.267-.31-1.073-.31-1.646 0-1.79.272-2.535-.529-2.728-.265-.064-.46-.106-1.137-.113-.869-.009-1.604.003-2.02.207-.277.135-.49.436-.36.453.161.02.526.099.72.363.25.341.24 1.107.24 1.107s.143 2.11-.333 2.372c-.327.179-.775-.186-1.737-1.854-.493-.851-.866-1.793-.866-1.793s-.072-.18-.202-.277c-.157-.117-.376-.154-.376-.154l-2.32.015s-.348.01-.476.161c-.114.135-.009.414-.009.414s1.816 4.25 3.872 6.392c1.886 1.966 4.03 1.838 4.03 1.838h.972z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="YouTube">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer__cols">
+                    <div class="footer__col">
+                        <h4>Продукты</h4>
+                        <ul>
+                            <li><a href="#products">Роботы-ассистенты</a></li>
+                            <li><a href="#products">Промышленные системы</a></li>
+                            <li><a href="#products">Дроны</a></li>
+                            <li><a href="#products">Компоненты</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer__col">
+                        <h4>Компания</h4>
+                        <ul>
+                            <li><a href="#about">О нас</a></li>
+                            <li><a href="#news">Новости</a></li>
+                            <li><a href="#" class="js-wip" data-section="career">Карьера</a></li>
+                            <li><a href="#" class="js-wip" data-section="partners">Партнёры</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer__col">
+                        <h4>Контакты</h4>
+                        <ul class="footer__contacts">
+                            <li><i class="fas fa-envelope"></i><a href="/cdn-cgi/l/email-protection#2940474f46695a44485b5d5b464b465d404a48075b5c"><span class="__cf_email__" data-cfemail="234a4d454c63504e425157514c414c574a40420d5156">[email&#160;protected]</span></a></li>
+                            <li><i class="fas fa-phone"></i><a href="tel:+79154263008">+7 (915) 426-30-08</a></li>
+                            <li><i class="fas fa-map-marker-alt"></i>Москва, ул. Инновационная, 42</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>© 2026 Smart Robotica. Все права защищены.</p>
+                <div class="footer__legal">
+                    <a href="#" class="js-wip" data-section="privacy">Политика конфиденциальности</a>
+                    <a href="#" class="js-wip" data-section="terms">Условия использования</a>
+                    <a href="admin.html" class="footer__admin-link" title="Войти в панель управления">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C9.243 2 7 4.243 7 7v2H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-2V7c0-2.757-2.243-5-5-5zm0 2c1.654 0 3 1.346 3 3v2H9V7c0-1.654 1.346-3 3-3zm0 10c1.103 0 2 .897 2 2s-.897 2-2 2-2-.897-2-2 .897-2 2-2z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ====== MOBILE FAB BUTTONS ====== -->
+    <button class="fab fab--callback" id="fab-callback" aria-label="Обратный звонок">
+        <i class="fas fa-phone-alt"></i>
+        <span class="fab__label">Звонок</span>
+    </button>
+    <button class="fab fab--cart" id="fab-cart" aria-label="Корзина">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="fab-cart-count" id="fab-cart-count">0</span>
+    </button>
+
+    <!-- ====== CART DRAWER ====== -->
+    <div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-drawer__overlay" id="cart-overlay"></div>
+        <aside class="cart-drawer__panel" role="dialog" aria-label="Корзина">
+            <div class="cart-drawer__head">
+                <h3><i class="fas fa-shopping-cart"></i> КОРЗИНА</h3>
+                <button class="cart-drawer__close" id="cart-close" aria-label="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-drawer__body" id="cart-items">
+                <div class="cart-empty">
+                    <i class="fas fa-robot"></i>
+                    <p>Корзина пуста</p>
+                    <span>Добавьте товары из каталога</span>
+                </div>
+            </div>
+            <div class="cart-drawer__foot" id="cart-footer" style="display:none">
+                <div class="cart-total">
+                    <span>Итого:</span>
+                    <strong class="cart-total__price" id="cart-total">0 &#x20BD;</strong>
+                </div>
+                <button class="btn btn--primary" id="cart-checkout" style="width:100%">
+                    <i class="fas fa-paper-plane"></i> Оформить заявку
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ====== MODAL: АРЕНДА ====== -->
+    <div class="modal" id="rent-modal" role="dialog" aria-modal="true" aria-labelledby="rent-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="rent-modal-close" aria-label="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="rent-modal-title">
+                АРЕНДА <span class="gradient-text">ОБОРУДОВАНИЯ</span>
+            </h2>
+            <p class="modal-subtitle">Оставьте заявку — мы свяжемся с вами в течение 30 минут</p>
+            <form id="rent-form" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="rent-model">Модель оборудования</label>
+                    <select id="rent-model" class="cyber-input">
+                        <option value="">Выберите модель</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="rent-date-start">Дата начала аренды</label>
+                    <input type="date" id="rent-date-start" class="cyber-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="rent-date-end">Дата окончания аренды</label>
+                    <input type="date" id="rent-date-end" class="cyber-input">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="rent-name">Имя *</label>
+                        <input type="text" id="rent-name" class="cyber-input" placeholder="Иван Петров" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="rent-phone">Телефон *</label>
+                        <input type="tel" id="rent-phone" class="cyber-input" placeholder="+7 (999) 000-00-00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="rent-email">Email *</label>
+                    <input type="email" id="rent-email" class="cyber-input" placeholder="you@example.ru" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="rent-comment">Комментарий</label>
+                    <textarea id="rent-comment" class="cyber-input" rows="3" placeholder="Расскажите о задаче…"></textarea>
+                </div>
+                <button type="submit" class="btn btn--primary" style="width:100%">
+                    <i class="fas fa-paper-plane"></i> Отправить заявку
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== MODAL: ОБРАТНЫЙ ЗВОНОК ====== -->
+    <div class="modal" id="callback-modal" role="dialog" aria-modal="true" aria-labelledby="callback-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal-content modal-content--sm">
+            <button class="modal-close" id="callback-modal-close" aria-label="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon"><i class="fas fa-phone-alt"></i></div>
+            <h2 class="modal-title" id="callback-modal-title">ОБРАТНЫЙ <span class="gradient-text">ЗВОНОК</span></h2>
+            <p class="modal-subtitle">Введите номер — перезвоним в течение 5 минут</p>
+            <form id="callback-form" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="cb-name">Ваше имя</label>
+                    <input type="text" id="cb-name" class="cyber-input" placeholder="Иван Петров">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="cb-phone">Телефон *</label>
+                    <input type="tel" id="cb-phone" class="cyber-input" placeholder="+7 (999) 000-00-00" required>
+                </div>
+                <button type="submit" class="btn btn--primary" style="width:100%">
+                    <i class="fas fa-phone-alt"></i> Перезвоните мне
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== MODAL: ДЕТАЛИ ПРОДУКТА ====== -->
+    <div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal-content modal-content--wide">
+            <button class="modal-close" id="details-modal-close" aria-label="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="details-modal-title">ИНФОРМАЦИЯ О МОДЕЛИ</h2>
+            <div class="modal-body" id="details-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- ====== MODAL: НОВОСТЬ ====== -->
+    <div class="modal" id="news-modal" role="dialog" aria-modal="true" aria-labelledby="news-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="news-modal-close" aria-label="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title" id="news-modal-title">НОВОСТЬ</h2>
+            <div class="modal-body" id="news-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- ====== MODAL: РАЗДЕЛ В РАЗРАБОТКЕ (WIP) ====== -->
+    <div class="modal" id="wip-modal" role="dialog" aria-modal="true" aria-labelledby="wip-modal-title">
+        <div class="modal__backdrop"></div>
+        <div class="modal-content modal-content--sm">
+            <button class="modal-close" id="wip-modal-close" aria-label="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="wip-icon" aria-hidden="true">
+                <i class="fas fa-tools"></i>
+                <div class="wip-icon__ring"></div>
+            </div>
+            <h2 class="modal-title" id="wip-modal-title">РАЗДЕЛ <span class="gradient-text">В РАЗРАБОТКЕ</span></h2>
+            <p class="modal-subtitle" id="wip-modal-desc">Этот раздел находится в разработке. Мы работаем над ним и скоро он появится на сайте.</p>
+            <div class="wip-meta" id="wip-modal-meta"></div>
+            <div class="wip-actions">
+                <button class="btn btn--outline" onclick="closeModal('wip-modal')">Понятно</button>
+                <button class="btn btn--primary" id="wip-notify-btn">
+                    <i class="fas fa-bell"></i> Уведомить меня
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- cms-data.js: данные CMS для синхронизации между устройствами.
+         Скачайте из панели "Бэкап → Синхронизация" и загрузите на хостинг в корень сайта. -->
+    <script>window.CMS_DATA = null;</script>
+    <script src="cms-data.js" onerror="console.info('cms-data.js не найден, используем localStorage')"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/cms.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script>
+        // Кнопка Аренда в бургер-меню
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('nav-rent-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('nav')?.classList.remove('open');
+                document.getElementById('burger')?.classList.remove('active');
+                document.getElementById('burger')?.setAttribute('aria-expanded', 'false');
+                openModal('rent-modal');
+            });
+        });
+    </script>
+</body>
+</html>
