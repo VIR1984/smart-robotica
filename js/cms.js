@@ -691,6 +691,12 @@ const CMS = {
 
         // Cart checkout
         document.getElementById('cart-checkout')?.addEventListener('click', () => {
+            // Отправляем содержимое корзины в Telegram
+            if (typeof window.tgSendCartOrder === 'function' && Cart.items.length) {
+                const total = Cart.total().toLocaleString('ru-RU') + ' ₽';
+                window.tgSendCartOrder(Cart.items, total);
+            }
+            if (typeof window.analyticsTrackLead === 'function') window.analyticsTrackLead('cart');
             closeCart();
             openModal('rent-modal');
         });
